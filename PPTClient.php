@@ -12,9 +12,15 @@ class PPTClient extends PPTConnection
     {
     }
 
+    /** initialize a connection to the OPeNDAP BES
+     *
+     * Whether tcp or udp this initializes the connection to the OPeNDAP
+     * Back-End Server using the ppt handshake.
+     *
+     * @return null if succcessful otherwise an error message
+     */
     private function initConnection()
     {
-        print( "initConnection\n" ) ;
         $result = parent::send( "PPTCLIENT_TESTING_CONNECTION" ) ;
         if( $result !== null )
         {
@@ -35,9 +41,15 @@ class PPTClient extends PPTConnection
         return null ;
     }
 
+    /** initialize a tcp connection to the OPeNDAP BES
+    *
+    * @param string host hostname where the OPeNDAP BES is running
+    * @param int port tcp port the OPeNDAP BES is listening on
+    * @param int timeout number of seconds to stop trying to connect
+    * @return null if successful otherwise an error message
+    */
     public function initTCPConnection( $host, $port, $timeout )
     {
-        print( "initTCPConnection\n" ) ;
         $this->socket = socket_create( AF_INET, SOCK_STREAM, SOL_TCP ) ;
         if( $this->socket === false )
         {
@@ -56,14 +68,26 @@ class PPTClient extends PPTConnection
         return $this->initConnection() ;
     }
 
+    /** initialize a local udp connection to the OPeNDAP BES
+     *
+     * Not yet implemented
+     *
+     * @param string unixsocket path to the udp socket to connect to
+     * @param int timeout number of seconds to stop trying to connect
+     * @return null if successful otherwise an error message
+     */
     public function initUnixCPConnection( $unixsocket, $timeout )
     {
-        print( "initUnixConnection\n" ) ;
+        return "Not yet imlemented" ;
     }
 
+    /** close the connection to the OPeNDAP BES
+     *
+     * Closes the connection by sending the exit extension chunk
+     *
+     */
     public function closeConnection()
     {
-        print( "closeConnection\n" ) ;
         if( $this->socket != null )
         {
             $result = $this->sendExit() ;
@@ -73,4 +97,3 @@ class PPTClient extends PPTConnection
 }
 
 ?>
-

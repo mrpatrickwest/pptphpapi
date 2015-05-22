@@ -25,11 +25,28 @@ else
     else
     {
         $data = "" ;
-        $extensions = array() ;
-        $result = $client->receiveResponse( $data, $extensions ) ;
-        if( $result != null )
+        $done = false ;
+        while( !$done )
         {
-            echo $result ;
+            $extensions = array() ;
+            $result = $client->receiveChunk( $data, $extensions ) ;
+            if( $result != null )
+            {
+                if( $result == "done" )
+                {
+                    $result = null ;
+                    $done = true ;
+                }
+                else
+                {
+                    print( "$result\n" ) ;
+                    break ;
+                }
+            }
+            else
+            {
+                print( "$data" ) ;
+            }
         }
     }
     $client->closeConnection() ;

@@ -19,7 +19,6 @@ class PPTConnection
      */
     public function send( $buffer )
     {
-        print( "send $buffer\n" ) ;
         $result = socket_write( $this->socket, $buffer, strlen( $buffer ) ) ;
         if( $result === false )
         {
@@ -56,9 +55,17 @@ class PPTConnection
         return $this->send( $msg ) ;
     }
 
+    /** send data and extensions to the server
+     *
+     * Both buffer and extensions can be null, which sends the
+     * terminating chunk
+     *
+     * @param string buffer data buffer to send to the server
+     * @param array extensions array of key/value pairs to send to server
+     * @return null if success otherwise an error message
+     */
     public function sendWithExtensions( $buffer, $extensions )
     {
-        print( "sendWithExtensions\n" ) ;
         $this->sendChunk( $buffer, $extensions ) ;
         if( $buffer != null )
         {
@@ -80,7 +87,6 @@ class PPTConnection
      */
     public function sendExtensions( $extensions )
     {
-        print( "sendExtensions\n" ) ;
         $ext = "" ;
         foreach( $extensions as $key => $value )
         {
@@ -114,7 +120,6 @@ class PPTConnection
      */
     public function sendExit()
     {
-        print( "sendExit\n" ) ;
         $extensions = array( "status" => "PPT_EXIT_NOW" ) ;
         return $this->sendWithExtensions( null, $extensions ) ;
     }
@@ -219,7 +224,7 @@ class PPTConnection
      * @return string "done" when read the terminating header, null to
      * continue reading, and a string if an error message
      */
-    private function receiveChunk( &$data, &$extensions )
+    public function receiveChunk( &$data, &$extensions )
     {
         $header = "" ;
         $result = $this->receive( $header, 8 ) ;
@@ -262,7 +267,6 @@ class PPTConnection
      */
     public function receive( &$data, $len )
     {
-        print( "receive\n" ) ;
         $data = socket_read( $this->socket, $len ) ;
         if( $data === false )
         {
@@ -270,7 +274,6 @@ class PPTConnection
                    .  socket_strerror( socket_last_error() ) . "\n" ;
             return $msg ;
         }
-        echo "received $data\n" ;
         return null ;
     }
 }
