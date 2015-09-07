@@ -137,7 +137,7 @@ class PPTConnection
     private function receiveExtensions( &$extensions, $len )
     {
         $extstr = "" ;
-        $result = $this->receive( $extstr, $len ) ;
+        $result = $this->receive( $extstr, $len, true ) ;
         if( $result != null )
         {
             return $result ;
@@ -179,7 +179,7 @@ class PPTConnection
      */
     private function receiveData( &$data, $len )
     {
-        return $this->receive( $data, $len ) ;
+        return $this->receive( $data, $len, true ) ;
     }
 
     /** receive a response to a BES request
@@ -227,7 +227,7 @@ class PPTConnection
     public function receiveChunk( &$data, &$extensions )
     {
         $header = "" ;
-        $result = $this->receive( $header, 8 ) ;
+        $result = $this->receive( $header, 8, true ) ;
         if( $result != null )
         {
             return $result ;
@@ -254,7 +254,9 @@ class PPTConnection
         }
         else
         {
-            $result = "Bad type" ;
+            $result = "Bad type $type" ;
+            $result .= "\n$header" ;
+            $result .= "\n$len" ;
         }
         return $result ;
     }
@@ -265,14 +267,24 @@ class PPTConnection
      * @param int len amount of data to read
      * @return string null if successful otherwise an error message
      */
-    public function receive( &$data, $len )
+    public function receive( &$data, $len, $mustmatch )
     {
-        $data = socket_read( $this->socket, $len ) ;
-        if( $data === false )
+        $buf = socket_read( $this->socket, $len ) ;
+        if( $buf === false )
         {
             $msg = "socket_read() failed: reason: "
                    .  socket_strerror( socket_last_error() ) . "\n" ;
             return $msg ;
+        }
+        $rlen = strlen( $buf ) ;
+        if( $mustmatch && $rlen != $len )
+        {
+            $data .= $buf ;
+            $this->receive( $data, $len - $rlen, true ) ;
+        }
+        else
+        {
+            $data .= $buf ;
         }
         return null ;
     }

@@ -14,7 +14,7 @@ else
     echo "All is well\n" ;
     $cmd = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <request reqID=\"some_unique_value\" >
-    <showVersion />
+    <showContainers />
 </request>
 " ;
     $result = $client->sendRequest( $cmd ) ;

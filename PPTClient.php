@@ -27,7 +27,7 @@ class PPTClient extends PPTConnection
             return $result ;
         }
         $data = "" ;
-        $result = parent::receive( $data, 64 ) ;
+        $result = parent::receive( $data, 64, false ) ;
         if( $result != null )
         {
             $msg = "handshake failed: received $result\n" ;
